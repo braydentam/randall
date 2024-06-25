@@ -1,0 +1,119 @@
+Brayden Tam
+806 223 217
+
+To understand how randall works, I initially looked over the code, built the program, then ran it.
+
+I added unit tests (specifically to check that the number of bytes outputted was correct), 
+and some more (like checking for memory leaks, etc.)
+
+I firstly refactored the rand64-hardware file. I created a .h file and added include guards, 
+adding all the hardware-related functions. 
+In the .c file, I imported the necessary libraries (cpuid and immintrin).
+
+Next, I refactored the rand64-software file. 
+Again, I created a .h file and added include guards, 
+adding all the software-related functions.
+In the .c file, I imported the necessary libraries (stdlib and stdio).
+
+For the above two, I didn't really need to write much code.
+
+I put the second part of the main function and writebytes into output.c and output.h. 
+I had to change the return type of a function from bool to _Bool, 
+since I didn't want to import a library inside a header file. 
+I created an output() function that takes nbytes, then tested this.
+
+I finally refactored the options.c/options.h file by 
+moving the first half of the main function into the files. 
+This function returns a number (which is nbytes which is fed into output). 
+I tested this and it built and passed the unit test.
+
+I removed unneccessary imports in their respective .c files.
+
+I implemented options parsing, taking in input and output and putting them in respective C-strings. 
+Everything thats not matched is assumed to be part of nbytes. 
+I changed stoll() to atoll() since it was now read as an argument.
+
+I also implemented the LA guide's handle_output(). 
+I plan to put these seperate functions into options.c and output.c, 
+but I'll continue to implement a bit more since I'm not sure if there's any "setup" 
+work I need to do in main just to get the ball rolling.
+
+I needed to change the unit test to include 
+input/output flags since my randall program requires it now.
+
+I further refactored the output file, by removing a function mainly for stdio, 
+and by including everything inside the handleOutput code.
+
+I added /F functionality by checking for strings in unmatched options that start with a /. 
+If it starts with a /, this is fed into the software initialization. 
+
+I added unit tests for both software and hardware input.
+
+I added lrand_48 capabilities. I added this to my software .c files. 
+How I did this was call the function twice, then shifted 
+one of them by 32 bits and ORed it with the other value. 
+This created my 64-bit value. I also created a doNothing() 
+function to satisfy the finalize function option in my handleOutput function().
+
+I added the default options, rdrand and stdio. 
+I realized I misinterpreted the options flags, so I fixed those bugs.
+
+I fixed l_rand48 random number generator, as it was repeating the same number. 
+The reason is because ome I forgot to use the initialization code.
+
+I completed the -o n bytes feature.
+I did this by allocating the size of a character times the option N. 
+I then place the random bytes in the buffer. I call the write function everytime I have N bytes.
+I then free everything from memory to prevent memory leaks.
+
+I created unit tests for all the different options.
+
+While testing, I got an address sanitizer warning about a shadow byte, 
+and I realized I allocated my buffer incorrectly. 
+I just assumed the upper-bound of size will be n * 9999 worth of data.
+Using this assumption, I allocated that amount of size, and no longer recieved that error.
+
+I refactored the options code to go into options.c/.h
+Now, the randall.c file is clean and everything is delegated
+to its respective file.
+
+TESTING:
+
+bash-4.4$ time dd if=/dev/urandom ibs=8192 obs=8192 count=16384 >/dev/null
+16384+0 records in
+16384+0 records out
+134217728 bytes (134 MB, 128 MiB) copied, 0.997756 s, 135 MB/s
+
+real    0m1.010s
+user    0m0.018s
+sys     0m0.921s
+
+bash-4.4$ time ./randall 133562368 >/dev/null
+
+real    0m4.957s
+user    0m4.165s
+sys     0m0.370s
+
+bash-4.4$ time ./randall 133562368 | cat >/dev/null
+
+real    0m4.728s
+user    0m4.488s
+sys     0m0.308s
+
+bash-4.4$ time ./randall 133562368 >rand.data
+
+real    0m4.840s
+user    0m4.154s
+sys     0m0.394s
+
+bash-4.4$ time ./randall -i /dev/urandom 133562368 >/dev/null
+
+real    0m3.225s
+user    0m2.175s
+sys     0m0.960s
+
+Surprisingly, piping into cat, and then putting it into /dev/null is faster than not piping. 
+Putting the results into a file surprisingly didn't take too much longer as well. 
+Using /dev/urandom is the fastest input source. 
+I did some googling and found that urandom always remains open, 
+even when the computer thinks there's no more entropy.
