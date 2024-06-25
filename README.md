@@ -1,7 +1,7 @@
 # Randall - CS 35L Project
 
 ## Overview
-Randall is a Random Byte Generator is a command-line interface (CLI) tool designed for generating random bytes. 
+Randall is a Random Byte Generator, a CLI tool designed for generating random bytes. 
 
 ## Features
 - **Seed Sources**: Choose from hardware, software, or file-based seed sources.
