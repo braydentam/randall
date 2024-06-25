@@ -39,18 +39,18 @@ Randall is a Random Byte Generator, a CLI tool designed for generating random by
 ### Examples
 
 1. Generate 5 random bytes using hardware RNG (`rdrand`) and output to standard output:
-   `sh
+   ```sh
    ./randall -i rdrand -o stdio 5
-   `
+   ```
 
 2. Generate 23 random bytes using software RNG (`lrand48_r`) and output to standard output:
-   `sh
+   ```sh
    ./randall -i lrand48_r -o stdio 23
-   `
+   ```
 
 3. Generate 42 random bytes using a file (`/dev/random`) as the seed source and output in blocks of 10 bytes:
-   `sh
+   ```sh
    ./randall -i /dev/random -o 10 42
-   `
+   ```
 
 my thought and development process are in notes.txt
